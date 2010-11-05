@@ -1,0 +1,147 @@
+   1              		.file	"delay.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	delay_us
+  13              	delay_us:
+  14              	.LFB3:
+  15              		.file 1 "../Library/delay/delay.c"
+   1:../Library/delay/delay.c **** /*
+   2:../Library/delay/delay.c **** Common Delay Routines
+   3:../Library/delay/delay.c **** 
+   4:../Library/delay/delay.c **** Please ensure the #defines are set according to the timer prescaler used for the target timer
+   5:../Library/delay/delay.c **** */
+   6:../Library/delay/delay.c **** #include "delay.h"
+   7:../Library/delay/delay.c **** #include "LPC214x.h"
+   8:../Library/delay/delay.c **** #include "rprintf.h"
+   9:../Library/delay/delay.c **** #include "target.h"
+  10:../Library/delay/delay.c **** 
+  11:../Library/delay/delay.c **** void delay_ms(int count)
+  12:../Library/delay/delay.c **** {
+  13:../Library/delay/delay.c **** 	for(int i=0; i<count; i++)
+  14:../Library/delay/delay.c **** 	{
+  15:../Library/delay/delay.c **** 		delay_us(1000);
+  16:../Library/delay/delay.c **** 	}
+  17:../Library/delay/delay.c **** }
+  18:../Library/delay/delay.c **** 
+  19:../Library/delay/delay.c **** void delay_us(int count)
+  20:../Library/delay/delay.c **** {
+  16              	 Function supports interworking.
+  17              		@ args = 0, pretend = 0, frame = 0
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              		@ link register save eliminated.
+  20              	.LVL0:
+  21              		.loc 1 23 0
+  21:../Library/delay/delay.c **** #ifdef TIMER1
+  22:../Library/delay/delay.c **** 	//Fcclk should be defined as system freq. in target.h
+  23:../Library/delay/delay.c **** 	T1MR0 = Fcclk/1000000; //Set the match register to measure 1MHz (1uS period)
+  22              	2, .L10
+  23 0000 4C209FE5 		mov	r3, #60
+  24 0004 3C30A0E3 		str	r3, [r2, #24]
+  25 0008 183082E5 		.loc 1 24 0
+  24:../Library/delay/delay.c **** 	T1MCR = (3<<0);	//Generate an interrupt when MR0 is matched
+  26              		r3, #3
+  27 000c 0330A0E3 		str	r3, [r2, #20]
+  28 0010 143082E5 		.loc 1 25 0
+  25:../Library/delay/delay.c **** 	T1TCR = (1<<1);	//Reset the Timer Count
+  29              	v	r3, #2
+  30 0014 0230A0E3 		str	r3, [r2, #4]
+  31 0018 043082E5 		.loc 1 26 0
+  26:../Library/delay/delay.c **** 	T1TCR = (1<<0);	//Start timer 1
+  32              	v	r1, #0
+  33 001c 0010A0E3 	.LVL1:
+  34              		mov	r3, #1
+  35 0020 0130A0E3 		.loc 1 20 0
+  36              		@ lr needed for prologue
+  37              		.loc 1 26 0
+  38              		str	r3, [r2, #4]
+  39 0024 043082E5 		b	.L2
+  40 0028 060000EA 	.L7:
+  41              	.LBB2:
+  42              		.loc 1 29 0
+  27:../Library/delay/delay.c **** 	for(int i=0; i<count; i++)
+  28:../Library/delay/delay.c **** 	{
+  29:../Library/delay/delay.c **** 		while(!(T1IR & (1<<0)));	//Wait for an MR0 interrupt
+  43              	10
+  44 002c 20209FE5 		ldr	r3, [r2, #0]
+  45 0030 003092E5 		tst	r3, #1
+  46 0034 010013E3 		beq	.L7
+  47 0038 FBFFFF0A 		.loc 1 30 0
+  30:../Library/delay/delay.c **** 		T1IR = (1<<0);		//Reset the interrupt register
+  48              	r3, #1
+  49 003c 0130A0E3 		str	r3, [r2, #0]
+  50 0040 003082E5 		.loc 1 27 0
+  51              		add	r1, r1, r3
+  52 0044 031081E0 	.L2:
+  53              		cmp	r1, r0
+  54 0048 000051E1 		blt	.L7
+  55 004c F6FFFFBA 	.LBE2:
+  56              		.loc 1 47 0
+  31:../Library/delay/delay.c **** 		//rprintf("+");
+  32:../Library/delay/delay.c **** 	}
+  33:../Library/delay/delay.c **** #endif
+  34:../Library/delay/delay.c **** #ifdef TIMER0
+  35:../Library/delay/delay.c **** 	//Fcclk should be defined as system freq. in target.h
+  36:../Library/delay/delay.c **** 	T0MR0 = Fcclk/1000000;	//Set the match register to measure 1MHz (1uS period)
+  37:../Library/delay/delay.c **** 	T0MCR = (3<<0);	//Generate an interrupt when MR0 is matched
+  38:../Library/delay/delay.c **** 	T0TCR = (1<<1);	//Reset the Timer Count
+  39:../Library/delay/delay.c **** 	T0TCR = (1<<0);	//Start timer 1
+  40:../Library/delay/delay.c **** 	for(int i=0; i<count; i++)
+  41:../Library/delay/delay.c **** 	{
+  42:../Library/delay/delay.c **** 		while(!(T0IR & (1<<0)));	//Wait for an MR0 interrupt
+  43:../Library/delay/delay.c **** 		T0IR = (1<<0);		//Reset the interrupt register
+  44:../Library/delay/delay.c **** 		//rprintf("+");
+  45:../Library/delay/delay.c **** 	}
+  46:../Library/delay/delay.c **** #endif
+  47:../Library/delay/delay.c **** }
+  57              	11:
+  58 0050 1EFF2FE1 		.align	2
+  59              	.L10:
+  60              		.word	-536838144
+  61              	.LFE3:
+  63              		.align	2
+  64              		.global	delay_ms
+  66              	delay_ms:
+  67              	.LFB2:
+  68              		.loc 1 12 0
+  69              		@ Function supports interworking.
+  70              		@ args = 0, pretend = 0, frame = 0
+  71              		@ frame_needed = 0, uses_anonymous_args = 0
+  72              	.LVL2:
+  73              		stmfd	sp!, {r4, r5, lr}
+  74              	.LCFI0:
+  75 0058 30402DE9 		.loc 1 12 0
+  76              		mov	r5, r0
+  77              		mov	r4, #0
+  78 005c 0050A0E1 	.LVL3:
+  79 0060 0040A0E3 		b	.L13
+  80              	.LVL4:
+  81 0064 000000EA 	.L14:
+  82              	.LBB3:
+  83              		.loc 1 15 0
+  84              		bl	delay_us
+  85              	.LVL5:
+  86 0068 FEFFFFEB 	.L13:
+  87              		.loc 1 13 0
+  88              		cmp	r4, r5
+  89              		.loc 1 15 0
+  90 006c 050054E1 		mov	r0, #1000
+  91              		.loc 1 13 0
+  92 0070 FA0FA0E3 		add	r4, r4, #1
+  93              		blt	.L14
+  94 0074 014084E2 	.LBE3:
+  95 0078 FAFFFFBA 		.loc 1 17 0
+  96              		ldmfd	sp!, {r4, r5, lr}
+  97              		bx	lr
+  98 007c 3040BDE8 	.LFE2:
+ 100              		.section	.debug_frame,"",%progbits
+ 101              	.Lframe0:
+ 144              	.Ldebug_loc0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 delay.c
+C:\DOCUME~1\rowens\LOCALS~1\Temp/cc8Maaaa.s:13     .text:00000000 delay_us
+C:\DOCUME~1\rowens\LOCALS~1\Temp/cc8Maaaa.s:23     .text:00000000 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/cc8Maaaa.s:62     .text:00000054 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/cc8Maaaa.s:68     .text:00000058 delay_ms
+C:\DOCUME~1\rowens\LOCALS~1\Temp/cc8Maaaa.s:75     .text:00000058 $a
+
+NO UNDEFINED SYMBOLS

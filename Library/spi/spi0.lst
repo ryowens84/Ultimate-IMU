@@ -1,0 +1,163 @@
+   1              		.file	"spi0.c"
+   9              	.Ltext0:
+  10              		.align	2
+  11              		.global	SPI0_Init
+  13              	SPI0_Init:
+  14              	.LFB2:
+  15              		.file 1 "Library/SPI/spi0.c"
+   1:Library/SPI/spi0.c **** /*
+   2:Library/SPI/spi0.c ****     SPI Communication for LPC2148 SPI0.
+   3:Library/SPI/spi0.c **** 	2/1/2008
+   4:Library/SPI/spi0.c **** 	Ryan Owens
+   5:Library/SPI/spi0.c **** 	
+   6:Library/SPI/spi0.c **** 	NOTES:
+   7:Library/SPI/spi0.c **** 	SCLK_PINSEL, MISO_PINSEL and MOSI_PINSEL must be defined in an external header file.  The definiti
+   8:Library/SPI/spi0.c **** 	correspond to the value that needs to be set in the PINSEL0 register.
+   9:Library/SPI/spi0.c **** 
+  10:Library/SPI/spi0.c **** */
+  11:Library/SPI/spi0.c **** 
+  12:Library/SPI/spi0.c **** #include "spi0.h"
+  13:Library/SPI/spi0.c **** #include "LPC214x.h"
+  14:Library/SPI/spi0.c **** #include <stdio.h>
+  15:Library/SPI/spi0.c **** 
+  16:Library/SPI/spi0.c **** void SPI0_Init(void)		//This function needs to go in bootup() of Main.c
+  17:Library/SPI/spi0.c **** {	
+  16              	 Function supports interworking.
+  17              		@ args = 0, pretend = 0, frame = 0
+  18              		@ frame_needed = 0, uses_anonymous_args = 0
+  19              		@ link register save eliminated.
+  20              		.loc 1 18 0
+  18:Library/SPI/spi0.c ****  in bootup() of Main.c
+  21              	r2, .L3
+  22 0000 30209FE5 		ldr	r3, [r2, #0]
+  23 0004 003092E5 		bic	r3, r3, #768
+  24 0008 033CC3E3 		orr	r3, r3, #256
+  25 000c 013C83E3 		str	r3, [r2, #0]
+  26 0010 003082E5 		.loc 1 19 0
+  19:Library/SPI/spi0.c **** o go in bootup() of Main.c
+  27              	3, [r2, #0]
+  28 0014 003092E5 		bic	r3, r3, #3072
+  29 0018 033BC3E3 		orr	r3, r3, #1024
+  30 001c 013B83E3 		str	r3, [r2, #0]
+  31 0020 003082E5 		.loc 1 20 0
+  20:Library/SPI/spi0.c **** o go in bootup() of Main.c
+  32              	r3, [r2, #0]
+  33 0024 003092E5 		bic	r3, r3, #12288
+  34 0028 033AC3E3 		orr	r3, r3, #4096
+  35 002c 013A83E3 		.loc 1 17 0
+  36              		@ lr needed for prologue
+  37              		.loc 1 20 0
+  38              		str	r3, [r2, #0]
+  39 0030 003082E5 		.loc 1 22 0
+  21:Library/SPI/spi0.c **** o go in bootup() of Main.c
+  22:Library/SPI/spi0.c **** {	
+  40              	L4:
+  41 0034 1EFF2FE1 		.align	2
+  42              	.L3:
+  43              		.word	-536690688
+  44              	.LFE2:
+  46              		.align	2
+  47              		.global	SPI0_send_recv
+  49              	SPI0_send_recv:
+  50              	.LFB5:
+  51              		.loc 1 35 0
+  52              		@ Function supports interworking.
+  23:Library/SPI/spi0.c ****  in bootup() of Main.c
+  24:Library/SPI/spi0.c **** {	
+  25:Library/SPI/spi0.c **** 	PINSEL0 = (PINSEL0 & ~(3 << 8)) | (1 << 8); // Enable SCLK0 on P0.4
+  26:Library/SPI/spi0.c **** 	PINSEL0 = (PINSEL0 & ~(3 << 10)) | (1 << 10); // Enable MISO0 on P0.5
+  27:Library/SPI/spi0.c **** 	PINSEL0 = (PINSEL0 & ~(3 << 12)) | (1 << 12); // Enable MOSI0 on P0.6
+  28:Library/SPI/spi0.c **** 
+  29:Library/SPI/spi0.c **** }
+  30:Library/SPI/spi0.c **** 
+  31:Library/SPI/spi0.c **** void SPI0_send(char c)
+  32:Library/SPI/spi0.c **** {
+  33:Library/SPI/spi0.c ****     SPI0_send_recv(c);
+  34:Library/SPI/spi0.c **** }
+  35:Library/SPI/spi0.c **** 
+  53              	pretend = 0, frame = 0
+  54              		@ frame_needed = 0, uses_anonymous_args = 0
+  55              		@ link register save eliminated.
+  56              	.LVL0:
+  57              		.loc 1 38 0
+  58              		ldr	r3, .L11
+  36:Library/SPI/spi0.c **** nd_recv(c);
+  37:Library/SPI/spi0.c **** }
+  38:Library/SPI/spi0.c **** 
+  59              	1 35 0
+  60 003c 20309FE5 		and	r0, r0, #255
+  61              		.loc 1 38 0
+  62 0040 FF0000E2 		str	r0, [r3, #8]
+  63              		.loc 1 35 0
+  64 0044 080083E5 		@ lr needed for prologue
+  65              	.L6:
+  66              		.loc 1 39 0
+  67              		ldr	r2, .L11
+  39:Library/SPI/spi0.c **** nd_recv(c);
+  68              	[r2, #4]
+  69 0048 14209FE5 		tst	r3, #128
+  70 004c 043092E5 		beq	.L6
+  71 0050 800013E3 		.loc 1 40 0
+  72 0054 FBFFFF0A 		ldr	r0, [r2, #8]
+  40:Library/SPI/spi0.c **** I0_send_recv(c);
+  73              	:
+  74 0058 080092E5 		and	r0, r0, #255
+  75              		.loc 1 42 0
+  76 005c FF0000E2 		bx	lr
+  41:Library/SPI/spi0.c **** I0_send_recv(c);
+  42:Library/SPI/spi0.c **** }
+  77              	:
+  78 0060 1EFF2FE1 		.align	2
+  79              	.L11:
+  80              		.word	-536739840
+  81              	.LFE5:
+  83              		.align	2
+  84              		.global	SPI0_recv
+  86              	SPI0_recv:
+  87              	.LFB4:
+  88              		.loc 1 30 0
+  89              		@ Function supports interworking.
+  90              		@ args = 0, pretend = 0, frame = 0
+  91              		@ frame_needed = 0, uses_anonymous_args = 0
+  92              		str	lr, [sp, #-4]!
+  93              	.LCFI0:
+  94 0068 04E02DE5 		.loc 1 31 0
+  95              		mov	r0, #255
+  96              		bl	SPI0_send_recv
+  97 006c FF00A0E3 		.loc 1 32 0
+  98 0070 FEFFFFEB 		ldr	lr, [sp], #4
+  99              		bx	lr
+ 100 0074 04E09DE4 	.LFE4:
+ 102              		.align	2
+ 103              		.global	SPI0_send
+ 105              	SPI0_send:
+ 106              	.LFB3:
+ 107              		.loc 1 25 0
+ 108              		@ Function supports interworking.
+ 109              		@ args = 0, pretend = 0, frame = 0
+ 110              		@ frame_needed = 0, uses_anonymous_args = 0
+ 111              		@ link register save eliminated.
+ 112              	.LVL2:
+ 113              		and	r0, r0, #255
+ 114              		@ lr needed for prologue
+ 115 007c FF0000E2 		.loc 1 27 0
+ 116              		.loc 1 26 0
+ 117              		b	SPI0_send_recv
+ 118              	.LVL3:
+ 119 0080 FEFFFFEA 	.LFE3:
+ 121              		.section	.debug_frame,"",%progbits
+ 122              	.Lframe0:
+ 177              	.Ldebug_loc0:
+DEFINED SYMBOLS
+                            *ABS*:00000000 spi0.c
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:13     .text:00000000 SPI0_Init
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:22     .text:00000000 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:45     .text:00000038 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:51     .text:0000003c SPI0_send_recv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:60     .text:0000003c $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:82     .text:00000064 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:88     .text:00000068 SPI0_recv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:94     .text:00000068 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccMbbaaa.s:107    .text:0000007c SPI0_send
+
+NO UNDEFINED SYMBOLS

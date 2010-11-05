@@ -1,0 +1,1130 @@
+   1              		.file	"RTC.cpp"
+   9              	.Ltext0:
+  10              		.section	.ctors,"aw",%progbits
+  11              		.align	2
+  12 0000 00000000 		.word	_GLOBAL__I_RTC
+  13              		.text
+  14              		.align	2
+  15              		.global	_ZN4cRTCC2Ev
+  17              	_ZN4cRTCC2Ev:
+  18              	.LFB3:
+  19              		.file 1 "../Library/rtc/RTC.cpp"
+   1:../Library/rtc/RTC.cpp **** /*
+   2:../Library/rtc/RTC.cpp **** 	RTC Library
+   3:../Library/rtc/RTC.cpp **** 	
+   4:../Library/rtc/RTC.cpp **** 	by Ryan Owens
+   5:../Library/rtc/RTC.cpp **** 	http://www.sparkfun.com
+   6:../Library/rtc/RTC.cpp ****  
+   7:../Library/rtc/RTC.cpp **** 	Example Code:
+   8:../Library/rtc/RTC.cpp **** 	RTC.begin(1);	//Initialize the RTC to use the external clock
+   9:../Library/rtc/RTC.cpp **** 	RTC.incrementEnable(1<<IMMIN);	//Enable Increment Interrupts on the Minute update	
+  10:../Library/rtc/RTC.cpp ****  	//Make sure the RTC interrupts are enabled
+  11:../Library/rtc/RTC.cpp **** 	VICIntEnable = INT_RTC;
+  12:../Library/rtc/RTC.cpp **** 	//Wait for an update(triggered by the RTC interrupt)
+  13:../Library/rtc/RTC.cpp **** 	while(!RTC.updated);
+  14:../Library/rtc/RTC.cpp **** 	RTC.updated=0;
+  15:../Library/rtc/RTC.cpp **** 	rprintf("%02d:%02d:%02d\r", RTC.getHour(), RTC.getMinute(), RTC.getSecond());
+  16:../Library/rtc/RTC.cpp **** */
+  17:../Library/rtc/RTC.cpp **** #include "RTC.h"
+  18:../Library/rtc/RTC.cpp **** #include <stdlib.h>
+  19:../Library/rtc/RTC.cpp **** #include <stdio.h>
+  20:../Library/rtc/RTC.cpp **** #include "LPC214x.h"
+  21:../Library/rtc/RTC.cpp **** #include "main.h"
+  22:../Library/rtc/RTC.cpp **** 
+  23:../Library/rtc/RTC.cpp **** extern "C"{
+  24:../Library/rtc/RTC.cpp **** #include "rprintf.h"
+  25:../Library/rtc/RTC.cpp **** }
+  26:../Library/rtc/RTC.cpp **** 
+  27:../Library/rtc/RTC.cpp **** #define GLOBALOBJECT
+  28:../Library/rtc/RTC.cpp **** #define DEBUG
+  29:../Library/rtc/RTC.cpp **** 
+  30:../Library/rtc/RTC.cpp **** //Create a 'global' instance of the RTC class
+  31:../Library/rtc/RTC.cpp **** cRTC RTC;
+  32:../Library/rtc/RTC.cpp **** 
+  33:../Library/rtc/RTC.cpp **** cRTC::cRTC(void)
+  20              	ction supports interworking.
+  21              		@ args = 0, pretend = 0, frame = 0
+  22              		@ frame_needed = 0, uses_anonymous_args = 0
+  23              		@ link register save eliminated.
+  24              	.LVL0:
+  25              		@ lr needed for prologue
+  26              		.loc 1 36 0
+  34:../Library/rtc/RTC.cpp **** {
+  35:../Library/rtc/RTC.cpp **** 	//Do Nothing
+  36:../Library/rtc/RTC.cpp **** }
+  27              	.LFE3:
+  29              		.global	__gxx_personality_sj0
+  30              		.align	2
+  31              		.global	_ZN4cRTCC1Ev
+  33              	_ZN4cRTCC1Ev:
+  34              	.LFB4:
+  35              		.loc 1 33 0
+  36              		@ Function supports interworking.
+  37              		@ args = 0, pretend = 0, frame = 0
+  38              		@ frame_needed = 0, uses_anonymous_args = 0
+  39              		@ link register save eliminated.
+  40              	.LVL1:
+  41              		@ lr needed for prologue
+  42              		.loc 1 36 0
+  43              		bx	lr
+  44              	.LFE4:
+  46              		.align	2
+  47              		.global	_ZN4cRTC5beginEj
+  49              	_ZN4cRTC5beginEj:
+  50              	.LFB5:
+  51              		.loc 1 39 0
+  52              		@ Function supports interworking.
+  37:../Library/rtc/RTC.cpp **** 
+  38:../Library/rtc/RTC.cpp **** //Used to initialize the RTC to the correct clock source. RTC is started by default
+  39:../Library/rtc/RTC.cpp **** void cRTC::begin(unsigned int source)
+  53              	frame = 0
+  54              		@ frame_needed = 0, uses_anonymous_args = 0
+  55              		@ link register save eliminated.
+  56              	.LVL2:
+  57              		.loc 1 41 0
+  58              		ldr	ip, .L11
+  40:../Library/rtc/RTC.cpp **** {
+  41:../Library/rtc/RTC.cpp **** 	CCR = (1<<CTCRST);	//Disable and reset the RTC
+  59              	3, #2
+  60 0008 50C09FE5 		.loc 1 44 0
+  61 000c 0230A0E3 		mov	r2, #0
+  42:../Library/rtc/RTC.cpp **** 	
+  43:../Library/rtc/RTC.cpp **** 	//Reset the time
+  44:../Library/rtc/RTC.cpp **** 	HOUR=0;
+  62              	oc 1 41 0
+  63 0010 0020A0E3 		str	r3, [ip, #8]
+  64              		.loc 1 44 0
+  65 0014 08308CE5 		str	r2, [ip, #40]
+  66              		.loc 1 45 0
+  67 0018 28208CE5 		str	r2, [ip, #36]
+  45:../Library/rtc/RTC.cpp **** 	MIN=0;
+  68              	1 46 0
+  69 001c 24208CE5 		str	r2, [ip, #32]
+  46:../Library/rtc/RTC.cpp **** 	SEC=0;
+  70              	loc 1 49 0
+  71 0020 20208CE5 		strb	r2, [r0, #0]
+  47:../Library/rtc/RTC.cpp **** 	
+  48:../Library/rtc/RTC.cpp **** 	//Initialized the 'updated' flag
+  49:../Library/rtc/RTC.cpp **** 	updated=0;
+  72              	loc 1 52 0
+  73 0024 0020C0E5 		cmp	r1, #0
+  50:../Library/rtc/RTC.cpp **** 	
+  51:../Library/rtc/RTC.cpp **** 	//If source is 0, set prescaler as RTC source
+  52:../Library/rtc/RTC.cpp **** 	if(source == 0)
+  74              	loc 1 53 0
+  75 0028 000051E3 		ldreq	r3, [ip, #8]
+  53:../Library/rtc/RTC.cpp **** 		CCR &= ~(1<<CLKSRC);
+  76              	loc 1 56 0
+  77 002c 08309C05 		ldrne	r3, [ip, #8]
+  54:../Library/rtc/RTC.cpp **** 	//If source is 1, set external 32.758 kHz clock as source
+  55:../Library/rtc/RTC.cpp **** 	else
+  56:../Library/rtc/RTC.cpp **** 		CCR |= (1<<CLKSRC);
+  78              	loc 1 53 0
+  79 0030 08309C15 		biceq	r3, r3, #16
+  80              		.loc 1 56 0
+  81 0034 1030C303 		orrne	r3, r3, #16
+  82              		str	r3, [ip, #8]
+  83 0038 10308313 		.loc 1 58 0
+  84 003c 08308CE5 		ldr	r3, .L11
+  57:../Library/rtc/RTC.cpp **** 	
+  58:../Library/rtc/RTC.cpp **** 	CCR &= ~(1<<CTCRST);	//Take the RTC out of reset
+  85              	, [r3, #8]
+  86 0040 18309FE5 		bic	r2, r2, #2
+  87 0044 082093E5 		str	r2, [r3, #8]
+  88 0048 0220C2E3 		.loc 1 59 0
+  89 004c 082083E5 		ldr	r2, [r3, #8]
+  59:../Library/rtc/RTC.cpp **** 	CCR |= (1<<CLKEN);	//Start the RTC.
+  90              	r2, r2, #1
+  91 0050 082093E5 		.loc 1 39 0
+  92 0054 012082E3 		@ lr needed for prologue
+  93              		.loc 1 59 0
+  94              		str	r2, [r3, #8]
+  95              		.loc 1 60 0
+  96 0058 082083E5 		bx	lr
+  60:../Library/rtc/RTC.cpp **** }
+  97              	.align	2
+  98 005c 1EFF2FE1 	.L11:
+  99              		.word	-536723456
+ 100              	.LFE5:
+ 102 0060 004002E0 		.align	2
+ 103              		.global	_ZN4cRTC5startEv
+ 105              	_ZN4cRTC5startEv:
+ 106              	.LFB6:
+ 107              		.loc 1 63 0
+ 108              		@ Function supports interworking.
+ 109              		@ args = 0, pretend = 0, frame = 0
+  61:../Library/rtc/RTC.cpp **** 
+  62:../Library/rtc/RTC.cpp **** //Used to start the RTC
+  63:../Library/rtc/RTC.cpp **** void cRTC::start(void)
+ 110              	ed = 0, uses_anonymous_args = 0
+ 111              		@ link register save eliminated.
+ 112              	.LVL3:
+ 113              		.loc 1 65 0
+ 114              		ldr	r2, .L15
+ 115              		ldr	r3, [r2, #8]
+  64:../Library/rtc/RTC.cpp **** {
+  65:../Library/rtc/RTC.cpp **** 	CCR |= (1<<CLKEN);
+ 116              	3, r3, #1
+ 117 0064 0C209FE5 		.loc 1 63 0
+ 118 0068 083092E5 		@ lr needed for prologue
+ 119 006c 013083E3 		.loc 1 65 0
+ 120              		str	r3, [r2, #8]
+ 121              		.loc 1 66 0
+ 122              		bx	lr
+ 123 0070 083082E5 	.L16:
+  66:../Library/rtc/RTC.cpp **** }
+ 124              	2
+ 125 0074 1EFF2FE1 	.L15:
+ 126              		.word	-536723456
+ 127              	.LFE6:
+ 129 0078 004002E0 		.align	2
+ 130              		.global	_ZN4cRTC4stopEv
+ 132              	_ZN4cRTC4stopEv:
+ 133              	.LFB7:
+ 134              		.loc 1 69 0
+ 135              		@ Function supports interworking.
+ 136              		@ args = 0, pretend = 0, frame = 0
+  67:../Library/rtc/RTC.cpp **** 
+  68:../Library/rtc/RTC.cpp **** //Used to stop the RTC
+  69:../Library/rtc/RTC.cpp **** void cRTC::stop(void)
+ 137              	ed = 0, uses_anonymous_args = 0
+ 138              		@ link register save eliminated.
+ 139              	.LVL4:
+ 140              		.loc 1 71 0
+ 141              		ldr	r2, .L19
+ 142              		ldr	r3, [r2, #8]
+  70:../Library/rtc/RTC.cpp **** {
+  71:../Library/rtc/RTC.cpp **** 	CCR &= ~(1<<CLKEN);
+ 143              	3, r3, #1
+ 144 007c 0C209FE5 		.loc 1 69 0
+ 145 0080 083092E5 		@ lr needed for prologue
+ 146 0084 0130C3E3 		.loc 1 71 0
+ 147              		str	r3, [r2, #8]
+ 148              		.loc 1 72 0
+ 149              		bx	lr
+ 150 0088 083082E5 	.L20:
+  72:../Library/rtc/RTC.cpp **** }
+ 151              	2
+ 152 008c 1EFF2FE1 	.L19:
+ 153              		.word	-536723456
+ 154              	.LFE7:
+ 156 0090 004002E0 		.align	2
+ 157              		.global	_ZN4cRTC11alarmEnableEh
+ 159              	_ZN4cRTC11alarmEnableEh:
+ 160              	.LFB8:
+ 161              		.loc 1 78 0
+ 162              		@ Function supports interworking.
+ 163              		@ args = 0, pretend = 0, frame = 0
+  73:../Library/rtc/RTC.cpp **** 
+  74:../Library/rtc/RTC.cpp **** //Used to enable alarm interrupts
+  75:../Library/rtc/RTC.cpp **** //(See the RTC_ISR.c file for the Interrupt Service Routine)
+  76:../Library/rtc/RTC.cpp **** //Inputs: mask - The mask which enables different components (HOUR, MIN, SEC, etc...) of the alarm
+  77:../Library/rtc/RTC.cpp **** //NOTE: See RTC.h for the bit definitions that can be used for the mask setting.
+  78:../Library/rtc/RTC.cpp **** void cRTC::alarmEnable(unsigned char mask)
+ 164              	ed = 0, uses_anonymous_args = 0
+ 165              		@ link register save eliminated.
+ 166              	.LVL5:
+ 167              		.loc 1 80 0
+ 168              		ldr	r3, .L23
+ 169              		.loc 1 78 0
+  79:../Library/rtc/RTC.cpp **** {
+  80:../Library/rtc/RTC.cpp **** 	AMR = mask;	//Enable the alarm masks for the Alarm
+ 170              	1, r1, #255
+ 171 0094 08309FE5 		@ lr needed for prologue
+ 172              		.loc 1 80 0
+ 173 0098 FF1001E2 		str	r1, [r3, #16]
+ 174              		.loc 1 81 0
+ 175              		bx	lr
+ 176 009c 101083E5 	.L24:
+  81:../Library/rtc/RTC.cpp **** }
+ 177              		2
+ 178 00a0 1EFF2FE1 	.L23:
+ 179              		.word	-536723456
+ 180              	.LFE8:
+ 182 00a4 004002E0 		.align	2
+ 183              		.global	_ZN4cRTC15incrementEnableEh
+ 185              	_ZN4cRTC15incrementEnableEh:
+ 186              	.LFB9:
+ 187              		.loc 1 87 0
+ 188              		@ Function supports interworking.
+ 189              		@ args = 0, pretend = 0, frame = 0
+  82:../Library/rtc/RTC.cpp **** 
+  83:../Library/rtc/RTC.cpp **** //Used to enable increment alarms
+  84:../Library/rtc/RTC.cpp **** //(See the RTC_ISR.c file for the Interrupt Service Routine)
+  85:../Library/rtc/RTC.cpp **** //Inputs: mask - The mask which enables different components (HOUR, MIN, SEC, etc...) of the alarm
+  86:../Library/rtc/RTC.cpp **** //NOTE: See RTC.h for the bit definitions that can be used for the mask setting.
+  87:../Library/rtc/RTC.cpp **** void cRTC::incrementEnable(unsigned char mask)
+ 190              	ed = 0, uses_anonymous_args = 0
+ 191              		@ link register save eliminated.
+ 192              	.LVL6:
+ 193              		.loc 1 89 0
+ 194              		ldr	r3, .L27
+ 195              		.loc 1 87 0
+  88:../Library/rtc/RTC.cpp **** {
+  89:../Library/rtc/RTC.cpp **** 	CIIR = mask;
+ 196              	1, r1, #255
+ 197 00a8 08309FE5 		@ lr needed for prologue
+ 198              		.loc 1 89 0
+ 199 00ac FF1001E2 		str	r1, [r3, #12]
+ 200              		.loc 1 90 0
+ 201              		bx	lr
+ 202 00b0 0C1083E5 	.L28:
+  90:../Library/rtc/RTC.cpp **** }
+ 203              		2
+ 204 00b4 1EFF2FE1 	.L27:
+ 205              		.word	-536723456
+ 206              	.LFE9:
+ 208 00b8 004002E0 		.align	2
+ 209              		.global	_ZN4cRTC7setTimeEjjj
+ 211              	_ZN4cRTC7setTimeEjjj:
+ 212              	.LFB10:
+ 213              		.loc 1 93 0
+ 214              		@ Function supports interworking.
+ 215              		@ args = 0, pretend = 0, frame = 0
+  91:../Library/rtc/RTC.cpp **** 
+  92:../Library/rtc/RTC.cpp **** //Used to set the time
+  93:../Library/rtc/RTC.cpp **** void cRTC::setTime(unsigned int hour, unsigned int minute, unsigned int second){
+ 216              	ed = 0, uses_anonymous_args = 0
+ 217              		@ link register save eliminated.
+ 218              	.LVL7:
+ 219              		.loc 1 94 0
+ 220              		ldr	r0, .L31
+ 221              	.LVL8:
+  94:../Library/rtc/RTC.cpp **** 	HOUR = hour;
+ 222              	1 93 0
+ 223 00bc 0C009FE5 		@ lr needed for prologue
+ 224              		.loc 1 94 0
+ 225              		str	r1, [r0, #40]
+ 226              		.loc 1 95 0
+ 227              		str	r2, [r0, #36]
+ 228 00c0 281080E5 		.loc 1 96 0
+  95:../Library/rtc/RTC.cpp **** 	MIN = minute;
+ 229              	, [r0, #32]
+ 230 00c4 242080E5 		.loc 1 97 0
+  96:../Library/rtc/RTC.cpp **** 	SEC = second;
+ 231              	x	lr
+ 232 00c8 203080E5 	.L32:
+  97:../Library/rtc/RTC.cpp **** }
+ 233              	align	2
+ 234 00cc 1EFF2FE1 	.L31:
+ 235              		.word	-536723456
+ 236              	.LFE10:
+ 238 00d0 004002E0 		.align	2
+ 239              		.global	_ZN4cRTC7setHourEj
+ 241              	_ZN4cRTC7setHourEj:
+ 242              	.LFB11:
+ 243              		.loc 1 100 0
+ 244              		@ Function supports interworking.
+ 245              		@ args = 0, pretend = 0, frame = 0
+  98:../Library/rtc/RTC.cpp **** 
+  99:../Library/rtc/RTC.cpp **** //Used to set the hour
+ 100:../Library/rtc/RTC.cpp **** void cRTC::setHour(unsigned int hour)
+ 246              	ed = 0, uses_anonymous_args = 0
+ 247              		@ link register save eliminated.
+ 248              	.LVL9:
+ 249              		.loc 1 102 0
+ 250              		ldr	r3, .L35
+ 251              		.loc 1 100 0
+ 101:../Library/rtc/RTC.cpp **** {
+ 102:../Library/rtc/RTC.cpp **** 	HOUR = hour;
+ 252              	needed for prologue
+ 253 00d4 04309FE5 		.loc 1 102 0
+ 254              		str	r1, [r3, #40]
+ 255              		.loc 1 103 0
+ 256              		bx	lr
+ 257 00d8 281083E5 	.L36:
+ 103:../Library/rtc/RTC.cpp **** }
+ 258              	n	2
+ 259 00dc 1EFF2FE1 	.L35:
+ 260              		.word	-536723456
+ 261              	.LFE11:
+ 263 00e0 004002E0 		.align	2
+ 264              		.global	_ZN4cRTC9setMinuteEj
+ 266              	_ZN4cRTC9setMinuteEj:
+ 267              	.LFB12:
+ 268              		.loc 1 106 0
+ 269              		@ Function supports interworking.
+ 270              		@ args = 0, pretend = 0, frame = 0
+ 104:../Library/rtc/RTC.cpp **** 
+ 105:../Library/rtc/RTC.cpp **** //Used to set the minute
+ 106:../Library/rtc/RTC.cpp **** void cRTC::setMinute(unsigned int minute)
+ 271              	ed = 0, uses_anonymous_args = 0
+ 272              		@ link register save eliminated.
+ 273              	.LVL10:
+ 274              		.loc 1 108 0
+ 275              		ldr	r3, .L39
+ 276              		.loc 1 106 0
+ 107:../Library/rtc/RTC.cpp **** {
+ 108:../Library/rtc/RTC.cpp **** 	MIN = minute;
+ 277              	needed for prologue
+ 278 00e4 04309FE5 		.loc 1 108 0
+ 279              		str	r1, [r3, #36]
+ 280              		.loc 1 109 0
+ 281              		bx	lr
+ 282 00e8 241083E5 	.L40:
+ 109:../Library/rtc/RTC.cpp **** }
+ 283              	n	2
+ 284 00ec 1EFF2FE1 	.L39:
+ 285              		.word	-536723456
+ 286              	.LFE12:
+ 288 00f0 004002E0 		.align	2
+ 289              		.global	_ZN4cRTC9setSecondEj
+ 291              	_ZN4cRTC9setSecondEj:
+ 292              	.LFB13:
+ 293              		.loc 1 112 0
+ 294              		@ Function supports interworking.
+ 295              		@ args = 0, pretend = 0, frame = 0
+ 110:../Library/rtc/RTC.cpp **** 
+ 111:../Library/rtc/RTC.cpp **** //Used to set the seconds
+ 112:../Library/rtc/RTC.cpp **** void cRTC::setSecond(unsigned int second)
+ 296              	ed = 0, uses_anonymous_args = 0
+ 297              		@ link register save eliminated.
+ 298              	.LVL11:
+ 299              		.loc 1 114 0
+ 300              		ldr	r3, .L43
+ 301              		.loc 1 112 0
+ 113:../Library/rtc/RTC.cpp **** {
+ 114:../Library/rtc/RTC.cpp **** 	SEC = second;
+ 302              	needed for prologue
+ 303 00f4 04309FE5 		.loc 1 114 0
+ 304              		str	r1, [r3, #32]
+ 305              		.loc 1 115 0
+ 306              		bx	lr
+ 307 00f8 201083E5 	.L44:
+ 115:../Library/rtc/RTC.cpp **** }
+ 308              	n	2
+ 309 00fc 1EFF2FE1 	.L43:
+ 310              		.word	-536723456
+ 311              	.LFE13:
+ 313 0100 004002E0 		.align	2
+ 314              		.global	_ZN4cRTC6setDowEj
+ 316              	_ZN4cRTC6setDowEj:
+ 317              	.LFB14:
+ 318              		.loc 1 118 0
+ 319              		@ Function supports interworking.
+ 320              		@ args = 0, pretend = 0, frame = 0
+ 116:../Library/rtc/RTC.cpp **** 
+ 117:../Library/rtc/RTC.cpp **** //Used to set the day of the week
+ 118:../Library/rtc/RTC.cpp **** void cRTC::setDow(unsigned int dow)
+ 321              	ed = 0, uses_anonymous_args = 0
+ 322              		@ link register save eliminated.
+ 323              	.LVL12:
+ 324              		.loc 1 120 0
+ 325              		ldr	r3, .L47
+ 326              		.loc 1 118 0
+ 119:../Library/rtc/RTC.cpp **** {
+ 120:../Library/rtc/RTC.cpp **** 	DOW = dow;
+ 327              	needed for prologue
+ 328 0104 04309FE5 		.loc 1 120 0
+ 329              		str	r1, [r3, #48]
+ 330              		.loc 1 121 0
+ 331              		bx	lr
+ 332 0108 301083E5 	.L48:
+ 121:../Library/rtc/RTC.cpp **** }
+ 333              	n	2
+ 334 010c 1EFF2FE1 	.L47:
+ 335              		.word	-536723456
+ 336              	.LFE14:
+ 338 0110 004002E0 		.align	2
+ 339              		.global	_ZN4cRTC6setDoyEj
+ 341              	_ZN4cRTC6setDoyEj:
+ 342              	.LFB15:
+ 343              		.loc 1 124 0
+ 344              		@ Function supports interworking.
+ 345              		@ args = 0, pretend = 0, frame = 0
+ 122:../Library/rtc/RTC.cpp **** 
+ 123:../Library/rtc/RTC.cpp **** //Used to set the day of the year
+ 124:../Library/rtc/RTC.cpp **** void cRTC::setDoy(unsigned int doy)
+ 346              	ed = 0, uses_anonymous_args = 0
+ 347              		@ link register save eliminated.
+ 348              	.LVL13:
+ 349              		.loc 1 126 0
+ 350              		ldr	r3, .L51
+ 351              		.loc 1 124 0
+ 125:../Library/rtc/RTC.cpp **** {
+ 126:../Library/rtc/RTC.cpp **** 	DOY = doy;
+ 352              	needed for prologue
+ 353 0114 04309FE5 		.loc 1 126 0
+ 354              		str	r1, [r3, #52]
+ 355              		.loc 1 127 0
+ 356              		bx	lr
+ 357 0118 341083E5 	.L52:
+ 127:../Library/rtc/RTC.cpp **** }
+ 358              	n	2
+ 359 011c 1EFF2FE1 	.L51:
+ 360              		.word	-536723456
+ 361              	.LFE15:
+ 363 0120 004002E0 		.align	2
+ 364              		.global	_ZN4cRTC6setDomEj
+ 366              	_ZN4cRTC6setDomEj:
+ 367              	.LFB16:
+ 368              		.loc 1 130 0
+ 369              		@ Function supports interworking.
+ 370              		@ args = 0, pretend = 0, frame = 0
+ 128:../Library/rtc/RTC.cpp **** 
+ 129:../Library/rtc/RTC.cpp **** //Used to set the day of the month
+ 130:../Library/rtc/RTC.cpp **** void cRTC::setDom(unsigned int dom)
+ 371              	ed = 0, uses_anonymous_args = 0
+ 372              		@ link register save eliminated.
+ 373              	.LVL14:
+ 374              		.loc 1 132 0
+ 375              		ldr	r3, .L55
+ 376              		.loc 1 130 0
+ 131:../Library/rtc/RTC.cpp **** {
+ 132:../Library/rtc/RTC.cpp **** 	DOM = dom;
+ 377              	needed for prologue
+ 378 0124 04309FE5 		.loc 1 132 0
+ 379              		str	r1, [r3, #44]
+ 380              		.loc 1 133 0
+ 381              		bx	lr
+ 382 0128 2C1083E5 	.L56:
+ 133:../Library/rtc/RTC.cpp **** }
+ 383              	n	2
+ 384 012c 1EFF2FE1 	.L55:
+ 385              		.word	-536723456
+ 386              	.LFE16:
+ 388 0130 004002E0 		.align	2
+ 389              		.global	_ZN4cRTC8setMonthEj
+ 391              	_ZN4cRTC8setMonthEj:
+ 392              	.LFB17:
+ 393              		.loc 1 136 0
+ 394              		@ Function supports interworking.
+ 395              		@ args = 0, pretend = 0, frame = 0
+ 134:../Library/rtc/RTC.cpp **** 
+ 135:../Library/rtc/RTC.cpp **** //Used to set the month
+ 136:../Library/rtc/RTC.cpp **** void cRTC::setMonth(unsigned int month)
+ 396              	ed = 0, uses_anonymous_args = 0
+ 397              		@ link register save eliminated.
+ 398              	.LVL15:
+ 399              		.loc 1 138 0
+ 400              		ldr	r3, .L59
+ 401              		.loc 1 136 0
+ 137:../Library/rtc/RTC.cpp **** {
+ 138:../Library/rtc/RTC.cpp **** 	MONTH = month;
+ 402              	needed for prologue
+ 403 0134 04309FE5 		.loc 1 138 0
+ 404              		str	r1, [r3, #56]
+ 405              		.loc 1 139 0
+ 406              		bx	lr
+ 407 0138 381083E5 	.L60:
+ 139:../Library/rtc/RTC.cpp **** }
+ 408              	n	2
+ 409 013c 1EFF2FE1 	.L59:
+ 410              		.word	-536723456
+ 411              	.LFE17:
+ 413 0140 004002E0 		.align	2
+ 414              		.global	_ZN4cRTC7setYearEj
+ 416              	_ZN4cRTC7setYearEj:
+ 417              	.LFB18:
+ 418              		.loc 1 142 0
+ 419              		@ Function supports interworking.
+ 420              		@ args = 0, pretend = 0, frame = 0
+ 140:../Library/rtc/RTC.cpp **** 
+ 141:../Library/rtc/RTC.cpp **** //Used to set year
+ 142:../Library/rtc/RTC.cpp **** void cRTC::setYear(unsigned int year)
+ 421              	ed = 0, uses_anonymous_args = 0
+ 422              		@ link register save eliminated.
+ 423              	.LVL16:
+ 424              		.loc 1 144 0
+ 425              		ldr	r3, .L63
+ 426              		.loc 1 142 0
+ 143:../Library/rtc/RTC.cpp **** {
+ 144:../Library/rtc/RTC.cpp **** 	YEAR = year;
+ 427              	needed for prologue
+ 428 0144 04309FE5 		.loc 1 144 0
+ 429              		str	r1, [r3, #60]
+ 430              		.loc 1 145 0
+ 431              		bx	lr
+ 432 0148 3C1083E5 	.L64:
+ 145:../Library/rtc/RTC.cpp **** }
+ 433              	n	2
+ 434 014c 1EFF2FE1 	.L63:
+ 435              		.word	-536723456
+ 436              	.LFE18:
+ 438 0150 004002E0 		.align	2
+ 439              		.global	_ZN4cRTC7getHourEv
+ 441              	_ZN4cRTC7getHourEv:
+ 442              	.LFB19:
+ 443              		.loc 1 148 0
+ 444              		@ Function supports interworking.
+ 445              		@ args = 0, pretend = 0, frame = 0
+ 146:../Library/rtc/RTC.cpp **** 
+ 147:../Library/rtc/RTC.cpp **** //Can be called to get the current hour
+ 148:../Library/rtc/RTC.cpp **** unsigned int cRTC::getHour(void)
+ 446              	ed = 0, uses_anonymous_args = 0
+ 447              		@ link register save eliminated.
+ 448              	.LVL17:
+ 449              		.loc 1 150 0
+ 450              		ldr	r3, .L67
+ 451              		ldr	r0, [r3, #40]
+ 149:../Library/rtc/RTC.cpp **** {
+ 150:../Library/rtc/RTC.cpp **** 	return HOUR;
+ 452              	:
+ 453 0154 04309FE5 		.loc 1 148 0
+ 454 0158 280093E5 		@ lr needed for prologue
+ 455              		.loc 1 151 0
+ 456              		bx	lr
+ 457              	.L68:
+ 151:../Library/rtc/RTC.cpp **** }
+ 458              	n	2
+ 459 015c 1EFF2FE1 	.L67:
+ 460              		.word	-536723456
+ 461              	.LFE19:
+ 463 0160 004002E0 		.align	2
+ 464              		.global	_ZN4cRTC9getMinuteEv
+ 466              	_ZN4cRTC9getMinuteEv:
+ 467              	.LFB20:
+ 468              		.loc 1 154 0
+ 469              		@ Function supports interworking.
+ 470              		@ args = 0, pretend = 0, frame = 0
+ 152:../Library/rtc/RTC.cpp **** 
+ 153:../Library/rtc/RTC.cpp **** //Can be called to get the current minute
+ 154:../Library/rtc/RTC.cpp **** unsigned int cRTC::getMinute(void)
+ 471              	ed = 0, uses_anonymous_args = 0
+ 472              		@ link register save eliminated.
+ 473              	.LVL19:
+ 474              		.loc 1 156 0
+ 475              		ldr	r3, .L71
+ 476              		ldr	r0, [r3, #36]
+ 155:../Library/rtc/RTC.cpp **** {
+ 156:../Library/rtc/RTC.cpp **** 	return MIN;
+ 477              	:
+ 478 0164 04309FE5 		.loc 1 154 0
+ 479 0168 240093E5 		@ lr needed for prologue
+ 480              		.loc 1 157 0
+ 481              		bx	lr
+ 482              	.L72:
+ 157:../Library/rtc/RTC.cpp **** }
+ 483              	n	2
+ 484 016c 1EFF2FE1 	.L71:
+ 485              		.word	-536723456
+ 486              	.LFE20:
+ 488 0170 004002E0 		.align	2
+ 489              		.global	_ZN4cRTC9getSecondEv
+ 491              	_ZN4cRTC9getSecondEv:
+ 492              	.LFB21:
+ 493              		.loc 1 160 0
+ 494              		@ Function supports interworking.
+ 495              		@ args = 0, pretend = 0, frame = 0
+ 158:../Library/rtc/RTC.cpp **** 
+ 159:../Library/rtc/RTC.cpp **** //Can be called to get the current seconds
+ 160:../Library/rtc/RTC.cpp **** unsigned int cRTC::getSecond(void)
+ 496              	ed = 0, uses_anonymous_args = 0
+ 497              		@ link register save eliminated.
+ 498              	.LVL21:
+ 499              		.loc 1 162 0
+ 500              		ldr	r3, .L75
+ 501              		ldr	r0, [r3, #32]
+ 161:../Library/rtc/RTC.cpp **** {
+ 162:../Library/rtc/RTC.cpp **** 	return SEC;
+ 502              	:
+ 503 0174 04309FE5 		.loc 1 160 0
+ 504 0178 200093E5 		@ lr needed for prologue
+ 505              		.loc 1 163 0
+ 506              		bx	lr
+ 507              	.L76:
+ 163:../Library/rtc/RTC.cpp **** }
+ 508              	n	2
+ 509 017c 1EFF2FE1 	.L75:
+ 510              		.word	-536723456
+ 511              	.LFE21:
+ 513 0180 004002E0 		.align	2
+ 514              		.global	_ZN4cRTC6getDowEv
+ 516              	_ZN4cRTC6getDowEv:
+ 517              	.LFB22:
+ 518              		.loc 1 166 0
+ 519              		@ Function supports interworking.
+ 520              		@ args = 0, pretend = 0, frame = 0
+ 164:../Library/rtc/RTC.cpp **** 
+ 165:../Library/rtc/RTC.cpp **** //Can be called to get the current day of the week
+ 166:../Library/rtc/RTC.cpp **** unsigned int cRTC::getDow(void)
+ 521              	ed = 0, uses_anonymous_args = 0
+ 522              		@ link register save eliminated.
+ 523              	.LVL23:
+ 524              		.loc 1 168 0
+ 525              		ldr	r3, .L79
+ 526              		ldr	r0, [r3, #48]
+ 167:../Library/rtc/RTC.cpp **** {
+ 168:../Library/rtc/RTC.cpp **** 	return DOW;
+ 527              	:
+ 528 0184 04309FE5 		.loc 1 166 0
+ 529 0188 300093E5 		@ lr needed for prologue
+ 530              		.loc 1 169 0
+ 531              		bx	lr
+ 532              	.L80:
+ 169:../Library/rtc/RTC.cpp **** }
+ 533              	n	2
+ 534 018c 1EFF2FE1 	.L79:
+ 535              		.word	-536723456
+ 536              	.LFE22:
+ 538 0190 004002E0 		.align	2
+ 539              		.global	_ZN4cRTC6getDoyEv
+ 541              	_ZN4cRTC6getDoyEv:
+ 542              	.LFB23:
+ 543              		.loc 1 172 0
+ 544              		@ Function supports interworking.
+ 545              		@ args = 0, pretend = 0, frame = 0
+ 170:../Library/rtc/RTC.cpp **** 
+ 171:../Library/rtc/RTC.cpp **** //Can be called to get the curent day of the year
+ 172:../Library/rtc/RTC.cpp **** unsigned int cRTC::getDoy(void)
+ 546              	ed = 0, uses_anonymous_args = 0
+ 547              		@ link register save eliminated.
+ 548              	.LVL25:
+ 549              		.loc 1 174 0
+ 550              		ldr	r3, .L83
+ 551              		ldr	r0, [r3, #52]
+ 173:../Library/rtc/RTC.cpp **** {
+ 174:../Library/rtc/RTC.cpp **** 	return DOY;
+ 552              	:
+ 553 0194 04309FE5 		.loc 1 172 0
+ 554 0198 340093E5 		@ lr needed for prologue
+ 555              		.loc 1 175 0
+ 556              		bx	lr
+ 557              	.L84:
+ 175:../Library/rtc/RTC.cpp **** }
+ 558              	n	2
+ 559 019c 1EFF2FE1 	.L83:
+ 560              		.word	-536723456
+ 561              	.LFE23:
+ 563 01a0 004002E0 		.align	2
+ 564              		.global	_ZN4cRTC6getDomEv
+ 566              	_ZN4cRTC6getDomEv:
+ 567              	.LFB24:
+ 568              		.loc 1 178 0
+ 569              		@ Function supports interworking.
+ 570              		@ args = 0, pretend = 0, frame = 0
+ 176:../Library/rtc/RTC.cpp **** 
+ 177:../Library/rtc/RTC.cpp **** //Can be used to get the current day of the month
+ 178:../Library/rtc/RTC.cpp **** unsigned int cRTC::getDom(void)
+ 571              	ed = 0, uses_anonymous_args = 0
+ 572              		@ link register save eliminated.
+ 573              	.LVL27:
+ 574              		.loc 1 180 0
+ 575              		ldr	r3, .L87
+ 576              		ldr	r0, [r3, #44]
+ 179:../Library/rtc/RTC.cpp **** {
+ 180:../Library/rtc/RTC.cpp **** 	return DOM;
+ 577              	:
+ 578 01a4 04309FE5 		.loc 1 178 0
+ 579 01a8 2C0093E5 		@ lr needed for prologue
+ 580              		.loc 1 181 0
+ 581              		bx	lr
+ 582              	.L88:
+ 181:../Library/rtc/RTC.cpp **** }
+ 583              	n	2
+ 584 01ac 1EFF2FE1 	.L87:
+ 585              		.word	-536723456
+ 586              	.LFE24:
+ 588 01b0 004002E0 		.align	2
+ 589              		.global	_ZN4cRTC8getMonthEv
+ 591              	_ZN4cRTC8getMonthEv:
+ 592              	.LFB25:
+ 593              		.loc 1 184 0
+ 594              		@ Function supports interworking.
+ 595              		@ args = 0, pretend = 0, frame = 0
+ 182:../Library/rtc/RTC.cpp **** 
+ 183:../Library/rtc/RTC.cpp **** //Can be used to get the month
+ 184:../Library/rtc/RTC.cpp **** unsigned int cRTC::getMonth(void)
+ 596              	ed = 0, uses_anonymous_args = 0
+ 597              		@ link register save eliminated.
+ 598              	.LVL29:
+ 599              		.loc 1 186 0
+ 600              		ldr	r3, .L91
+ 601              		ldr	r0, [r3, #56]
+ 185:../Library/rtc/RTC.cpp **** {
+ 186:../Library/rtc/RTC.cpp **** 	return MONTH;
+ 602              	:
+ 603 01b4 04309FE5 		.loc 1 184 0
+ 604 01b8 380093E5 		@ lr needed for prologue
+ 605              		.loc 1 187 0
+ 606              		bx	lr
+ 607              	.L92:
+ 187:../Library/rtc/RTC.cpp **** }
+ 608              	n	2
+ 609 01bc 1EFF2FE1 	.L91:
+ 610              		.word	-536723456
+ 611              	.LFE25:
+ 613 01c0 004002E0 		.align	2
+ 614              		.global	_ZN4cRTC7getYearEv
+ 616              	_ZN4cRTC7getYearEv:
+ 617              	.LFB26:
+ 618              		.loc 1 190 0
+ 619              		@ Function supports interworking.
+ 620              		@ args = 0, pretend = 0, frame = 0
+ 188:../Library/rtc/RTC.cpp **** 
+ 189:../Library/rtc/RTC.cpp **** //Can be used to get the year
+ 190:../Library/rtc/RTC.cpp **** unsigned int cRTC::getYear(void)
+ 621              	ed = 0, uses_anonymous_args = 0
+ 622              		@ link register save eliminated.
+ 623              	.LVL31:
+ 624              		.loc 1 192 0
+ 625              		ldr	r3, .L95
+ 626              		ldr	r0, [r3, #60]
+ 191:../Library/rtc/RTC.cpp **** {
+ 192:../Library/rtc/RTC.cpp **** 	return YEAR;
+ 627              	:
+ 628 01c4 04309FE5 		.loc 1 190 0
+ 629 01c8 3C0093E5 		@ lr needed for prologue
+ 630              		.loc 1 193 0
+ 631              		bx	lr
+ 632              	.L96:
+ 193:../Library/rtc/RTC.cpp **** }
+ 633              	n	2
+ 634 01cc 1EFF2FE1 	.L95:
+ 635              		.word	-536723456
+ 636              	.LFE26:
+ 638 01d0 004002E0 		.align	2
+ 639              		.global	_ZN4cRTC11alarmSecondEj
+ 641              	_ZN4cRTC11alarmSecondEj:
+ 642              	.LFB27:
+ 643              		.loc 1 196 0
+ 644              		@ Function supports interworking.
+ 645              		@ args = 0, pretend = 0, frame = 0
+ 194:../Library/rtc/RTC.cpp **** 
+ 195:../Library/rtc/RTC.cpp **** //Used to set the alarm second value
+ 196:../Library/rtc/RTC.cpp **** void cRTC::alarmSecond(unsigned int second)
+ 646              	ed = 0, uses_anonymous_args = 0
+ 647              		@ link register save eliminated.
+ 648              	.LVL33:
+ 649              		.loc 1 198 0
+ 650              		ldr	r3, .L99
+ 651              		.loc 1 196 0
+ 197:../Library/rtc/RTC.cpp **** {
+ 198:../Library/rtc/RTC.cpp **** 	ALSEC = second;
+ 652              	needed for prologue
+ 653 01d4 04309FE5 		.loc 1 198 0
+ 654              		str	r1, [r3, #96]
+ 655              		.loc 1 199 0
+ 656              		bx	lr
+ 657 01d8 601083E5 	.L100:
+ 199:../Library/rtc/RTC.cpp **** }
+ 658              	n	2
+ 659 01dc 1EFF2FE1 	.L99:
+ 660              		.word	-536723456
+ 661              	.LFE27:
+ 663 01e0 004002E0 		.align	2
+ 664              		.global	_ZN4cRTC11alarmSecondEv
+ 666              	_ZN4cRTC11alarmSecondEv:
+ 667              	.LFB28:
+ 668              		.loc 1 202 0
+ 669              		@ Function supports interworking.
+ 670              		@ args = 0, pretend = 0, frame = 0
+ 200:../Library/rtc/RTC.cpp **** 
+ 201:../Library/rtc/RTC.cpp **** //Used to get the alarm second value
+ 202:../Library/rtc/RTC.cpp **** unsigned int cRTC::alarmSecond(void)
+ 671              	ed = 0, uses_anonymous_args = 0
+ 672              		@ link register save eliminated.
+ 673              	.LVL34:
+ 674              		.loc 1 204 0
+ 675              		ldr	r3, .L103
+ 676              		ldr	r0, [r3, #96]
+ 203:../Library/rtc/RTC.cpp **** {
+ 204:../Library/rtc/RTC.cpp **** 	return ALSEC;
+ 677              	:
+ 678 01e4 04309FE5 		.loc 1 202 0
+ 679 01e8 600093E5 		@ lr needed for prologue
+ 680              		.loc 1 205 0
+ 681              		bx	lr
+ 682              	.L104:
+ 205:../Library/rtc/RTC.cpp **** }
+ 683              	n	2
+ 684 01ec 1EFF2FE1 	.L103:
+ 685              		.word	-536723456
+ 686              	.LFE28:
+ 688 01f0 004002E0 		.align	2
+ 689              		.global	_ZN4cRTC11alarmMinuteEj
+ 691              	_ZN4cRTC11alarmMinuteEj:
+ 692              	.LFB29:
+ 693              		.loc 1 208 0
+ 694              		@ Function supports interworking.
+ 695              		@ args = 0, pretend = 0, frame = 0
+ 206:../Library/rtc/RTC.cpp **** 
+ 207:../Library/rtc/RTC.cpp **** //Used to set the alarm minute value
+ 208:../Library/rtc/RTC.cpp **** void cRTC::alarmMinute(unsigned int minute)
+ 696              	ed = 0, uses_anonymous_args = 0
+ 697              		@ link register save eliminated.
+ 698              	.LVL36:
+ 699              		.loc 1 210 0
+ 700              		ldr	r3, .L107
+ 701              		.loc 1 208 0
+ 209:../Library/rtc/RTC.cpp **** {
+ 210:../Library/rtc/RTC.cpp **** 	ALMIN = minute;
+ 702              	needed for prologue
+ 703 01f4 04309FE5 		.loc 1 210 0
+ 704              		str	r1, [r3, #100]
+ 705              		.loc 1 211 0
+ 706              		bx	lr
+ 707 01f8 641083E5 	.L108:
+ 211:../Library/rtc/RTC.cpp **** }
+ 708              	n	2
+ 709 01fc 1EFF2FE1 	.L107:
+ 710              		.word	-536723456
+ 711              	.LFE29:
+ 713 0200 004002E0 		.align	2
+ 714              		.global	_ZN4cRTC11alarmMinuteEv
+ 716              	_ZN4cRTC11alarmMinuteEv:
+ 717              	.LFB30:
+ 718              		.loc 1 214 0
+ 719              		@ Function supports interworking.
+ 720              		@ args = 0, pretend = 0, frame = 0
+ 212:../Library/rtc/RTC.cpp **** 
+ 213:../Library/rtc/RTC.cpp **** //Used to get the alarm minute vlaue
+ 214:../Library/rtc/RTC.cpp **** unsigned int cRTC::alarmMinute(void)
+ 721              	ed = 0, uses_anonymous_args = 0
+ 722              		@ link register save eliminated.
+ 723              	.LVL37:
+ 724              		.loc 1 216 0
+ 725              		ldr	r3, .L111
+ 726              		ldr	r0, [r3, #100]
+ 215:../Library/rtc/RTC.cpp **** {
+ 216:../Library/rtc/RTC.cpp **** 	return ALMIN;
+ 727              	:
+ 728 0204 04309FE5 		.loc 1 214 0
+ 729 0208 640093E5 		@ lr needed for prologue
+ 730              		.loc 1 217 0
+ 731              		bx	lr
+ 732              	.L112:
+ 217:../Library/rtc/RTC.cpp **** }
+ 733              	n	2
+ 734 020c 1EFF2FE1 	.L111:
+ 735              		.word	-536723456
+ 736              	.LFE30:
+ 738 0210 004002E0 		.align	2
+ 739              		.global	_ZN4cRTC9alarmHourEj
+ 741              	_ZN4cRTC9alarmHourEj:
+ 742              	.LFB31:
+ 743              		.loc 1 220 0
+ 744              		@ Function supports interworking.
+ 745              		@ args = 0, pretend = 0, frame = 0
+ 218:../Library/rtc/RTC.cpp **** 
+ 219:../Library/rtc/RTC.cpp **** //Used to set the alarm hour
+ 220:../Library/rtc/RTC.cpp **** void cRTC::alarmHour(unsigned int hour)
+ 746              	ed = 0, uses_anonymous_args = 0
+ 747              		@ link register save eliminated.
+ 748              	.LVL39:
+ 749              		.loc 1 222 0
+ 750              		ldr	r3, .L115
+ 751              		.loc 1 220 0
+ 221:../Library/rtc/RTC.cpp **** {
+ 222:../Library/rtc/RTC.cpp **** 	ALHOUR = hour;
+ 752              	needed for prologue
+ 753 0214 04309FE5 		.loc 1 222 0
+ 754              		str	r1, [r3, #104]
+ 755              		.loc 1 223 0
+ 756              		bx	lr
+ 757 0218 681083E5 	.L116:
+ 223:../Library/rtc/RTC.cpp **** }
+ 758              	n	2
+ 759 021c 1EFF2FE1 	.L115:
+ 760              		.word	-536723456
+ 761              	.LFE31:
+ 763 0220 004002E0 		.align	2
+ 764              		.global	_ZN4cRTC9alarmHourEv
+ 766              	_ZN4cRTC9alarmHourEv:
+ 767              	.LFB32:
+ 768              		.loc 1 226 0
+ 769              		@ Function supports interworking.
+ 770              		@ args = 0, pretend = 0, frame = 0
+ 224:../Library/rtc/RTC.cpp **** 
+ 225:../Library/rtc/RTC.cpp **** //Used to get the alarm hour
+ 226:../Library/rtc/RTC.cpp **** unsigned int cRTC::alarmHour(void)
+ 771              	ed = 0, uses_anonymous_args = 0
+ 772              		@ link register save eliminated.
+ 773              	.LVL40:
+ 774              		.loc 1 228 0
+ 775              		ldr	r3, .L119
+ 776              		ldr	r0, [r3, #104]
+ 227:../Library/rtc/RTC.cpp **** {
+ 228:../Library/rtc/RTC.cpp **** 	return ALHOUR;
+ 777              	:
+ 778 0224 04309FE5 		.loc 1 226 0
+ 779 0228 680093E5 		@ lr needed for prologue
+ 780              		.loc 1 229 0
+ 781              		bx	lr
+ 782              	.L120:
+ 229:../Library/rtc/RTC.cpp **** }
+ 783              	n	2
+ 784 022c 1EFF2FE1 	.L119:
+ 785              		.word	-536723456
+ 786              	.LFE32:
+ 788 0230 004002E0 		.align	2
+ 789              		.global	_Z7ISR_RTCv
+ 791              	_Z7ISR_RTCv:
+ 792              	.LFB33:
+ 793              		.loc 1 235 0
+ 794              		@ Function supports interworking.
+ 795              		@ args = 0, pretend = 0, frame = 0
+ 230:../Library/rtc/RTC.cpp **** 
+ 231:../Library/rtc/RTC.cpp **** //Usage: None (Automatically Called by FW)
+ 232:../Library/rtc/RTC.cpp **** //Inputs: None
+ 233:../Library/rtc/RTC.cpp **** //Description: Called when the RTC alarm goes off.  This wakes
+ 234:../Library/rtc/RTC.cpp **** //				the Package Tracker from sleep mode.
+ 235:../Library/rtc/RTC.cpp **** void ISR_RTC(void)
+ 796              	ed = 0, uses_anonymous_args = 0
+ 797              		@ link register save eliminated.
+ 798              		.loc 1 238 0
+ 799              		ldr	r3, .L123
+ 800              		mov	r2, #3
+ 236:../Library/rtc/RTC.cpp **** {	
+ 237:../Library/rtc/RTC.cpp **** 	//Clear the Alarm Interrupt bit from the ILR
+ 238:../Library/rtc/RTC.cpp **** 	ILR = ((1<<1)|(1<<0));
+ 801              	r2, [r3, #0]
+ 802 0234 20309FE5 		.loc 1 240 0
+ 803 0238 0320A0E3 		ldr	r3, .L123+4
+ 804 023c 002083E5 		mov	r2, #1
+ 239:../Library/rtc/RTC.cpp **** 	//RTC_Set=1;	//Set the RTC Increment Flag
+ 240:../Library/rtc/RTC.cpp **** 	RTC.updated=1;
+ 805              	b	r2, [r3, #0]
+ 806 0240 18309FE5 		.loc 1 242 0
+ 807 0244 0120A0E3 		mov	r2, #0
+ 808 0248 0020C3E5 		mvn	r3, #0
+ 241:../Library/rtc/RTC.cpp **** 	//wake_event=RTC_TIMEOUT_WAKE;
+ 242:../Library/rtc/RTC.cpp **** 	VICVectAddr =0;		//Update the VIC priorities
+ 809              	c 1 235 0
+ 810 024c 0020A0E3 		@ lr needed for prologue
+ 811 0250 0030E0E3 		.loc 1 242 0
+ 812              		str	r2, [r3, #-4047]
+ 813              		.loc 1 243 0
+ 814              		bx	lr
+ 815 0254 CF2F03E5 	.L124:
+ 243:../Library/rtc/RTC.cpp **** }
+ 816              		2
+ 817 0258 1EFF2FE1 	.L123:
+ 818              		.word	-536723456
+ 819              		.word	RTC
+ 820              	.LFE33:
+ 822 0260 00000000 		.align	2
+ 824              	_Z41__static_initialization_and_destruction_0ii:
+ 825              	.LFB34:
+ 826              		.loc 1 243 0
+ 827              		@ Function supports interworking.
+ 828              		@ args = 0, pretend = 0, frame = 0
+ 829              		@ frame_needed = 0, uses_anonymous_args = 0
+ 830              		@ link register save eliminated.
+ 831              	.LVL42:
+ 832              		@ lr needed for prologue
+ 833              		.loc 1 243 0
+ 834              		bx	lr
+ 835              	.LFE34:
+ 837 0264 1EFF2FE1 		.align	2
+ 839              	_GLOBAL__I_RTC:
+ 840              	.LFB35:
+ 841              		.loc 1 244 0
+ 842              		@ Function supports interworking.
+ 843              		@ args = 0, pretend = 0, frame = 0
+ 244:../Library/rtc/RTC.cpp **** ...
+ 844              	onymous_args = 0
+ 845              		@ link register save eliminated.
+ 846              		@ lr needed for prologue
+ 847              		.loc 1 244 0
+ 848              		bx	lr
+ 849              	.LFE35:
+ 851 0268 1EFF2FE1 		.global	RTC
+ 852              		.bss
+ 853              		.align	2
+ 856              	RTC:
+ 857              		.space	4
+ 858              		.section	.debug_frame,"",%progbits
+ 859              	.Lframe0:
+ 860 0000 00000000 		.4byte	.LECIE0-.LSCIE0
+ 1143              	.LLST8:
+DEFINED SYMBOLS
+                            *ABS*:00000000 RTC.cpp
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:12     .ctors:00000000 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:842    .text:00000268 _GLOBAL__I_RTC
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:17     .text:00000000 _ZN4cRTCC2Ev
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:28     .text:00000000 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:35     .text:00000004 _ZN4cRTCC1Ev
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:51     .text:00000008 _ZN4cRTC5beginEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:102    .text:00000060 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:108    .text:00000064 _ZN4cRTC5startEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:117    .text:00000064 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:129    .text:00000078 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:135    .text:0000007c _ZN4cRTC4stopEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:144    .text:0000007c $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:156    .text:00000090 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:162    .text:00000094 _ZN4cRTC11alarmEnableEh
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:171    .text:00000094 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:182    .text:000000a4 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:188    .text:000000a8 _ZN4cRTC15incrementEnableEh
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:197    .text:000000a8 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:208    .text:000000b8 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:214    .text:000000bc _ZN4cRTC7setTimeEjjj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:223    .text:000000bc $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:238    .text:000000d0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:244    .text:000000d4 _ZN4cRTC7setHourEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:253    .text:000000d4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:263    .text:000000e0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:269    .text:000000e4 _ZN4cRTC9setMinuteEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:278    .text:000000e4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:288    .text:000000f0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:294    .text:000000f4 _ZN4cRTC9setSecondEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:303    .text:000000f4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:313    .text:00000100 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:319    .text:00000104 _ZN4cRTC6setDowEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:328    .text:00000104 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:338    .text:00000110 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:344    .text:00000114 _ZN4cRTC6setDoyEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:353    .text:00000114 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:363    .text:00000120 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:369    .text:00000124 _ZN4cRTC6setDomEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:378    .text:00000124 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:388    .text:00000130 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:394    .text:00000134 _ZN4cRTC8setMonthEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:403    .text:00000134 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:413    .text:00000140 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:419    .text:00000144 _ZN4cRTC7setYearEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:428    .text:00000144 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:438    .text:00000150 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:444    .text:00000154 _ZN4cRTC7getHourEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:453    .text:00000154 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:463    .text:00000160 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:469    .text:00000164 _ZN4cRTC9getMinuteEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:478    .text:00000164 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:488    .text:00000170 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:494    .text:00000174 _ZN4cRTC9getSecondEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:503    .text:00000174 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:513    .text:00000180 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:519    .text:00000184 _ZN4cRTC6getDowEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:528    .text:00000184 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:538    .text:00000190 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:544    .text:00000194 _ZN4cRTC6getDoyEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:553    .text:00000194 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:563    .text:000001a0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:569    .text:000001a4 _ZN4cRTC6getDomEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:578    .text:000001a4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:588    .text:000001b0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:594    .text:000001b4 _ZN4cRTC8getMonthEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:603    .text:000001b4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:613    .text:000001c0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:619    .text:000001c4 _ZN4cRTC7getYearEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:628    .text:000001c4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:638    .text:000001d0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:644    .text:000001d4 _ZN4cRTC11alarmSecondEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:653    .text:000001d4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:663    .text:000001e0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:669    .text:000001e4 _ZN4cRTC11alarmSecondEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:678    .text:000001e4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:688    .text:000001f0 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:694    .text:000001f4 _ZN4cRTC11alarmMinuteEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:703    .text:000001f4 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:713    .text:00000200 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:719    .text:00000204 _ZN4cRTC11alarmMinuteEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:728    .text:00000204 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:738    .text:00000210 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:744    .text:00000214 _ZN4cRTC9alarmHourEj
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:753    .text:00000214 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:763    .text:00000220 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:769    .text:00000224 _ZN4cRTC9alarmHourEv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:778    .text:00000224 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:788    .text:00000230 $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:794    .text:00000234 _Z7ISR_RTCv
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:802    .text:00000234 $a
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:821    .text:0000025c $d
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:859    .bss:00000000 RTC
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:827    .text:00000264 _Z41__static_initialization_and_destruction_0ii
+C:\DOCUME~1\rowens\LOCALS~1\Temp/ccicaaaa.s:837    .text:00000264 $a
+                             .bss:00000000 $d
+
+UNDEFINED SYMBOLS
+__gxx_personality_sj0
