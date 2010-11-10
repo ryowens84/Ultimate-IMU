@@ -3,6 +3,8 @@
 
 
 char memoryBegin(void);
+char memoryExists(char * file_name);
+int memoryDelete(char * file_name);
 
 class cMemory
 {
@@ -15,7 +17,7 @@ class cMemory
 		void close(void);
 		void open(void);
 		
-	private:
+	//private:
 		struct fat16_file_struct * handle;
 		
 };

@@ -103,6 +103,16 @@ void cMemory::open(void)
 	handle = root_open(file_name);
 }
 
+int memoryDelete(char * file_name)
+{
+	return root_delete(file_name);
+}
+
+char memoryExists(char * file_name)
+{
+	return root_file_exists(file_name);
+}
+
 char memoryBegin(void)
 {
 	//Bring up SD and Open the root directory
