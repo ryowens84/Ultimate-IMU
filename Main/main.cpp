@@ -50,7 +50,7 @@ extern "C"{
 //*******************************************************
 void bootUp(void);
 void reset(void);
-
+void runTest(void);
 
 //*******************************************************
 //					Global Variables
@@ -61,6 +61,7 @@ long int timeout=0;
 
 cMemory sensorData;
 
+
 //*******************************************************
 //					Main Code
 //*******************************************************
@@ -68,7 +69,10 @@ int main (void)
 {
 	//Initialize ARM I/O
 	bootUp();			//Init. I/O ports, Comm protocols and interrupts
-	memoryBegin();
+	if(!memoryBegin())
+	{
+		rprintf("SD Card Initialization Failed");
+	}
 	XBEEon();
 	LEDoff();
 
@@ -78,6 +82,26 @@ int main (void)
 	timer1Init(1000000);
 	timer1Match(0, 1000, interruptOnMatch | resetOnMatch);
 	
+	if(memoryExists("Test.txt")){
+		rprintf("Testing...");	
+		VICIntEnable |= INT_TIMER1;
+		//Set the UART0 pins to I/O for initial XBee test
+		PINSEL0 &= ~((3<<0) | (3<<2));	//Set P0.0 and P0.1 to GPIO
+		IODIR0 |= (1<<0)|(1<<1);	//Set P0.0 and P0.1 to outputs
+		
+		for(int blink=0; blink < 10; blink++)
+		{
+			IOSET0 = (1<<0)|(1<<1);	//Turn on P0.0 and P0.1
+			timeout = millis();
+			while(millis() < timeout+50);
+			IOCLR0 = (1<<0)|(1<<1);
+			timeout = millis();
+			while(millis() < timeout+50);
+		}
+		runTest();
+		while(1);
+	}
+	rprintf("No Test");
 	accelerometer.begin();
 	gyro.begin();
 	compass.begin();	
@@ -190,4 +214,61 @@ void reset(void)
     WDFEED = 0x55;
     WDFEED = 0xAA;
     WDFEED = 0x00;
+}
+
+void runTest(void)
+{
+	char value;
+	int gpstest;
+	
+	//Enable the serial port
+	//Initialize UART for RPRINTF
+    rprintf_devopen(putc_serial0); //Init rprintf
+	init_serial0(9600);	
+
+	//Test the GPS I/O
+	IODIR0 &= ~((1<<8)|(1<<9)|(1<<12));	//Set P0.8, P0.9 and P0.12 to inputs
+	gpstest = IOPIN0;
+	gpstest = (gpstest>>8)&0x13;
+	if(gpstest != 0x11)
+	{
+		rprintf("GPS Failed.");
+		while(1);
+	}
+	
+	//Test the Accelerometer
+	accelerometer.begin();
+	//Get the Device ID from the accelerometer
+	value = DEVID;
+	accelerometer.read(&value, 1);
+	if(value != 0xE5)
+	{
+		rprintf("Accel Failed to ping");
+		while(1);
+	}
+	
+	//Test the Gyroscope
+	gyro.begin();
+	//Get the Device ID from the gyro
+	value = WHO_AM_I;
+	gyro.read(&value, 1);
+	if((value & 0x68) != 0x68)
+	{
+		rprintf("Gyro failed to ping");
+		while(1);
+	}
+	
+	//Test the compass
+	compass.begin();
+	//Get the device ID from the compass
+	value = ID_REGA;
+	compass.read(&value, 1);
+	if(value != 0x48)
+	{
+		rprintf("Compass failed to ping");
+		while(1);
+	}
+	
+	rprintf("Pass!");
+	LEDon();
 }
