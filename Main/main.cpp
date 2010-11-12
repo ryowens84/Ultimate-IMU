@@ -56,7 +56,8 @@ void runTest(void);
 //					Global Variables
 //*******************************************************
 char sensors_updated=0;
-char sensor_string[50]="Test";
+char sensor_string[70]="Test";
+char log_string[255]="Empty";
 long int timeout=0;
 
 cMemory sensorData;
@@ -101,7 +102,7 @@ int main (void)
 		runTest();
 		while(1);
 	}
-	rprintf("No Test");
+
 	accelerometer.begin();
 	gyro.begin();
 	compass.begin();	
@@ -110,6 +111,7 @@ int main (void)
 	uart1RxInt(0);
 	VICIntEnable |= INT_TIMER0|INT_TIMER1|INT_UART1;
 	
+	LEDon();
 	gps.begin(4800);
 	timeout = millis();
 	while(millis() < timeout+100);
@@ -125,18 +127,19 @@ int main (void)
 
 	while(1)
 	{
-		if(timer0IntFlag==1)
+		if(timer0IntFlag>0)
 		{
 			VICIntEnClr |= INT_TIMER0;
+			
+			if(timer0IntFlag > 1)LEDon();
+			else LEDoff();
+			
 			timer0IntFlag=0;
 			
 			accelerometer.update();
 			gyro.update();
 			compass.update();
 			sensors_updated=1;	
-			
-			if(IOPIN0 & LED)LEDoff();
-			else LEDon();
 			
 			VICIntEnable |= INT_TIMER0;
 		}
@@ -156,12 +159,21 @@ int main (void)
 		{
 			sensors_updated=0;
 			
-			sprintf(sensor_string, "%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f\n\r",
+			sprintf(sensor_string, "%ld,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f,%5.2f\n\r",
+					millis(),
 					accelerometer.getX(), accelerometer.getY(), accelerometer.getZ(),
 					gyro.getX(), gyro.getY(), gyro.getZ(),
 					compass.getX(), compass.getY(), compass.getZ());
-
-			sensorData.save(sensor_string);
+			
+			//Copy the data to a larger buffer. This keeps the number of 'saves' lower, which results
+			//in less overruns in reading the sensors.
+			strcat(log_string, sensor_string);
+			if(strlen(log_string) > 195)
+			{
+				sensorData.save(log_string);
+				sprintf(log_string, "");
+			}
+			
 		}
 		
 		//If a USB Cable gets plugged in, stop everything!
@@ -271,4 +283,5 @@ void runTest(void)
 	
 	rprintf("Pass!");
 	LEDon();
+	memoryDelete("Test.txt");
 }
