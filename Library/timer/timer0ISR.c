@@ -18,7 +18,7 @@ char timer0IntFlag=0;
 void ISR_Timer0(void)
 {
 	//Interrupt Code Here
-	timer0IntFlag=1;
+	timer0IntFlag+=1;
 	
 	//Clear the interrupt and update the VIC priority
 	T0IR = 0xFF;
