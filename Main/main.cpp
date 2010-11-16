@@ -38,6 +38,7 @@ extern "C"{
 //						C++ Libs
 //*******************************************************
 #include "main.h"
+#include "configuration.h"
 #include "ADXL345.h"
 #include "HMC5843.h"
 #include "ITG3200.h"
@@ -49,19 +50,24 @@ extern "C"{
 //					Core Functions
 //*******************************************************
 void bootUp(void);
-void reset(void);
 void runTest(void);
 
 //*******************************************************
 //					Global Variables
 //*******************************************************
+//Version Information.
+//KEEP THIS UPDATED!
+char major_version=0;
+char minor_version=1;
+
 char sensors_updated=0;
 char sensor_string[70]="Test";
 char log_string[255]="Empty";
 long int timeout=0;
 
 cMemory sensorData;
-
+cMemory gpsData;
+cMemory configData;
 
 //*******************************************************
 //					Main Code
@@ -102,7 +108,19 @@ int main (void)
 		runTest();
 		while(1);
 	}
-
+	
+	if(memoryExists("configuration.txt")){
+		readConfigFile(configData);
+	}
+	else
+	{
+		createConfigFile(configData);
+		reset();
+	}
+	configMenu();
+	memoryDelete("configuration.txt");
+	createConfigFile(configData);
+	
 	accelerometer.begin();
 	gyro.begin();
 	compass.begin();	
@@ -121,7 +139,7 @@ int main (void)
 	gps.disable();
 	timeout = millis();
 	while(millis() < timeout+500);
-	gps.enable(4,1);
+	gps.enable(RMC,1);
 	timeout = millis();
 	while(millis() < timeout+100);
 
@@ -285,3 +303,4 @@ void runTest(void)
 	LEDon();
 	memoryDelete("Test.txt");
 }
+

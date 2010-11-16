@@ -1,6 +1,8 @@
 #ifndef main_h
 #define main_h
 
+#include <stdint.h>
+
 #define LED	(1<<15)
 #define XBEE_EN	(1<<10)
 
@@ -9,5 +11,13 @@
 
 #define XBEEon()		IOSET0 = XBEE_EN
 #define XBEEoff()		IOCLR0 = XBEE_EN
+
+#define NUM_CONFIG_PARAMS	6
+
+extern char major_version;
+extern char minor_version;
+extern char log_string[255];
+
+void reset(void);
 
 #endif

@@ -90,6 +90,7 @@ CPPSRC =
 # use file-extension cpp for C++-files (use extension .cpp)
 
 CPPSRCARM = $(TARGET).cpp
+CPPSRCARM += configuration.cpp
 CPPSRCARM += $(ADXLPATH)ADXL345.cpp
 CPPSRCARM += $(I2CPATH)I2C.cpp
 CPPSRCARM += $(HMCPATH)HMC5843.cpp
