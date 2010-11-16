@@ -7,7 +7,6 @@ Written by Ryan Owens
 //TODO: Add sensor header files to allow for updated the classes
 
 #include "LPC214x.h"
-#include "main.h"
 #include "timer0ISR.h"
 
 char timer0IntFlag=0;

@@ -10,7 +10,6 @@
 */
 #include "LPC214x.h"
 #include "uart1ISR.h"
-#include "main.h"
 
 char uart1Message[75];
 int mindex=0;

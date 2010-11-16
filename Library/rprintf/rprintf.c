@@ -26,9 +26,6 @@
 #include <stdarg.h>
 #include <string.h>
 #include "rprintf.h"
-#include "main.h"
-
-
 
 #define SCRATCH 12  //32Bits go up to 4GB + 1 Byte for \0
 

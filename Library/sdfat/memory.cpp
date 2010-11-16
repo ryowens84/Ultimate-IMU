@@ -23,7 +23,7 @@ extern "C"{
 	#include "rootdir.h"
 	#include "fat16.h"
 	#include "sd_raw.h"
-	//#include "delay.h"
+	#include "rprintf.h"
 }
 
 #define GLOBALOBJECT
@@ -67,6 +67,17 @@ int cMemory::create(const char * name, const char * extension)
 	return 1;
 }
 
+int cMemory::create(const char * name)
+{
+	strcpy(&file_name[0], name);
+	
+	//Get the file handle of the new file.  We will log the data to this file
+	handle = root_open_new(file_name);	
+	if(handle == NULL) return 0;
+	
+	return 1;
+}
+
 int cMemory::save(char * data)
 {
 	int error=0;
@@ -101,6 +112,29 @@ void cMemory::close(void)
 void cMemory::open(void)
 {
 	handle = root_open(file_name);
+}
+
+void cMemory::open(char * new_file_name)
+{
+	int32_t offset=0;
+	
+	sprintf(file_name, "%s", new_file_name);
+	open();
+	fat16_seek_file(handle, &offset, FAT16_SEEK_SET);
+}
+
+int cMemory::readLine(char * buffer){
+	char readChar[2]="";
+	while(readChar[0] != '\n')
+	{
+		if(fat16_read_file(handle, (uint8_t *)readChar, 1)<0)
+			return 0;
+		else{
+			*buffer++=readChar[0];
+		}
+	}
+	*buffer++='\0';
+	return 1;
 }
 
 int memoryDelete(char * file_name)
