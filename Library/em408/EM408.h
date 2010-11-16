@@ -63,4 +63,11 @@ extern cEM408 gps;
 
 #define GPS_CHECKSUM(mstr, mx)  {mx=0; for(int mi = 0; mi < strlen(mstr);mi++ ) mx ^= mstr[mi];}
 
+#define GGA	0
+#define	GLL	1
+#define GSA	2
+#define GSV	3
+#define	RMC	4
+#define VTG	5
+
 #endif
