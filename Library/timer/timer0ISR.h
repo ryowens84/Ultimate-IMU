@@ -11,5 +11,6 @@ Written By Ryan Owens
 
 extern char timer0IntFlag;
 void ISR_Timer0(void);
+long int millis(void);
 
 #endif

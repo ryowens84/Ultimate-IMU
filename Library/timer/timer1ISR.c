@@ -10,8 +10,6 @@ Written by Ryan Owens
 #include "timer1ISR.h"
 
 char timer1IntFlag=0;
-long int ms=0;
-
 
 //Usage: None (Automatically Called by FW)
 //Inputs: None
@@ -21,17 +19,10 @@ void ISR_Timer1(void)
 	//Interrupt Code Here
 	timer1IntFlag=1;	
 	
-	//Keep track of the number of milliseconds (or ticks, depending on the ISR frequency)
-	ms++;
-	
 	//Clear the interrupt and update the VIC priority
 	T1IR = 0xFF;
 	VICVectAddr =0;						
 }
 
-long int millis(void)
-{
-	return ms;
-}
 
 
