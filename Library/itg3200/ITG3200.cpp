@@ -28,7 +28,7 @@
 extern "C"
 {
 	#include "rprintf.h"
-	#include "timer1ISR.h"	
+	#include "timer1.h"	
 }
 
 #define GLOBALOBJECT
@@ -73,11 +73,12 @@ void cITG3200::begin(void)
 	//Wait for the PLL clocks to stabilize
 	values[0]=INT_STATUS;
 	read(values, 1);
+	/*
 	while(!(values[0] & INT_CFG_ITG_RDY_EN))
 	{
 		values[0]=INT_STATUS;
 		read(values, 1);
-	}	
+	}*/	
 	
 	updated=0;
 }
@@ -117,15 +118,13 @@ char cITG3200::update(void)
 
 void cITG3200::calibrate(void)
 {
-	long int timeout=0;
 	for(int i=0; i<16; i++)
 	{
 		update();	//Get new values while device is not moving
 		x_cal+=(int16_t)xr;
 		y_cal+=(int16_t)yr;
 		z_cal+=(int16_t)zr;
-		timeout=millis();
-		while(millis() < timeout+100);
+		delay_ms(100);
 	}
 	x_cal/=16;
 	y_cal/=16;
@@ -159,4 +158,26 @@ float cITG3200::getTemp(void)
 	tempr = tempr/280;	//Convert the offset to degree C
 	tempr += 35;	//Add 35 degrees C to compensate for the offset
 	return tempr;
+}
+
+void cITG3200::setCalibrationValues(int x, int y, int z)
+{
+	x_cal=x;
+	y_cal=y;
+	z_cal=z;
+}
+
+int16_t cITG3200::getXcal(void)
+{
+	return x_cal;
+}
+
+int16_t cITG3200::getYcal(void)
+{
+	return y_cal;
+}
+
+int16_t cITG3200::getZcal(void)
+{
+	return z_cal;
 }
