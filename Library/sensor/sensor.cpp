@@ -20,7 +20,8 @@ cSensor filter;
 
 cSensor::cSensor(void)
 {
-	Axz=0;
+	Axz=0, Ayz=0;
+	EstAxz=0, EstAyz=0;
 	gyro_weight=5;
 	signRzGyro=0;
 	AccTheta=0, EstTheta=0;
@@ -29,16 +30,18 @@ cSensor::cSensor(void)
 	first_run=2;
 }
 
-void cSensor::fillAccelValues(float x, float z)
+void cSensor::fillRwAcc(float x, float y, float z)
 {
 	RwAcc[0] = x;
-	RwAcc[1] = z;
+	RwAcc[1] = y;
+	RwAcc[2] = z;
 }
 
 void cSensor::normalizeVector(double * vector)
 {
 	double R;
-	R = sqrt(vector[0]*vector[0] + vector[1]*vector[1]);
+	R = sqrt(vector[0]*vector[0] + vector[1]*vector[1] + vector[2]*vector[2]);
 	vector[0] /= R;
 	vector[1] /= R;	
+	vector[2] /= R;
 }
