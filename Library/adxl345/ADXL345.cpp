@@ -42,6 +42,10 @@
 #include "LPC21xx_SFE.h"
 #include "main.h"
 
+extern "C"{
+#include "timer1.h"
+}
+
 #define GLOBALOBJECT
 
 cADXL345 accelerometer(0, ADXL_ADDR);
@@ -54,10 +58,10 @@ cADXL345::cADXL345(int port, char i2c_address)
 	
 }
 
-void cADXL345::begin(void)
+void cADXL345::begin(char range)
 {
 	configure();
-	
+
 	//Put the accelerometer in MEASURE mode
 	values[0]=POWER_CTL;
 	values[1] = MEASURE;
@@ -65,10 +69,25 @@ void cADXL345::begin(void)
 	
 	//Set the Range to +/- 4G
 	values[0] = DATA_FORMAT;
-	values[1] = RANGE_0;
+	values[1] = range;
 	write(values, 2);
 	
 	//default ADXL345 rate is 100 Hz. Perfect!
+	
+	//Assign the gain depending on the range input.
+	//gain = (total range)/1024
+	switch(range){
+		case 0: gain = 0.0039;	// range = +/-2g. gain = 4/1024.
+			break;
+		case 1: gain = 0.0078;	// range = +/-4g. gain = 8/1024.
+			break;
+		case 2: gain = 0.0156;  // range = +/-8g. gain = 16/1024.
+			break;
+		case 3: gain = 0.0313;  // range = +/-16g. gain = 32/1024.
+			break;
+		default: gain = 0.0078;
+			break;
+	}
 	
 	updated=0;
 }
@@ -106,18 +125,60 @@ char cADXL345::update(void)
 
 double cADXL345::getX(void)
 {
-	xg=xg*0.0078;
+	xg-=x_cal;
+	xg=xg*gain;
 	return xg;
 }
 
 double cADXL345::getY(void)
 {
-	yg=yg*0.0078;
+	yg-=y_cal;
+	yg=yg*gain;
 	return yg;
 }
 
 double cADXL345::getZ(void)
 {
-	zg=zg*0.0078;
+	zg-=z_cal;
+	zg=zg*gain;
 	return zg;
+}
+
+void cADXL345::setCalibrationValues(int x, int y, float z)
+{
+	x_cal=x;
+	y_cal=y;
+	z_cal=z;
+}
+
+int16_t cADXL345::getXcal(void)
+{
+	return x_cal;
+}
+
+int16_t cADXL345::getYcal(void)
+{
+	return y_cal;
+}
+
+float cADXL345::getZcal(void)
+{
+	return z_cal;
+}
+
+void cADXL345::calibrate(void)
+{
+	for(int i=0; i<16; i++)
+	{
+		update();	//Get new values while device is not moving
+		x_cal+=(int16_t)xg;
+		y_cal+=(int16_t)yg;
+		z_cal+=(int16_t)zg;
+		delay_ms(100);
+	}
+	x_cal/=16;
+	y_cal/=16;
+	z_cal/=16;
+	
+	z_cal -= (1.0/gain);	//Z axis should be calibrated to 1g. This will offset the calibration value for 1g instead of 0g.
 }

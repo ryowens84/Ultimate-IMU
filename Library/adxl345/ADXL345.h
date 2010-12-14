@@ -10,11 +10,16 @@ class cADXL345: public I2C
 		char updated;
 	
 		cADXL345(int port, char i2c_address);
-		void begin(void);
+		void begin(char range);
 		char read(char * values, char length);
 		char write(char * values, char length);
 		void powerDown(void);
 		char update(void);
+		void calibrate(void);
+		void setCalibrationValues(int x, int y, float z);
+		int16_t getXcal(void);
+		int16_t getYcal(void);
+		float getZcal(void);		
 		
 		double getX(void);
 		double getY(void);
@@ -22,12 +27,13 @@ class cADXL345: public I2C
 		
 	private:
 		char _i2c_address;
-		//int16_t x;
-		//int16_t y;
-		//int16_t z;
+		int16_t x_cal;
+		int16_t y_cal;
+		float z_cal;
 		float xg;
 		float yg;
 		float zg;
+		float gain;
 		char values[6];
 };
 
