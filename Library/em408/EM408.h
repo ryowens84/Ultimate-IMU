@@ -61,7 +61,7 @@ class cEM408
 };
 extern cEM408 gps;
 
-#define GPS_CHECKSUM(mstr, mx)  {mx=0; for(int mi = 0; mi < strlen(mstr);mi++ ) mx ^= mstr[mi];}
+#define GPS_CHECKSUM(mstr, mx)  {mx=0; for(unsigned int mi = 0; mi < strlen(mstr);mi++ ) mx ^= mstr[mi];}
 
 #define GGA	0
 #define	GLL	1
