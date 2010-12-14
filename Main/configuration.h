@@ -14,16 +14,23 @@ class cConfig{
 		cConfig(void);
 		char log_sensor;
 		char log_gps;
-		char sensor_freq;
-		char accel_scale;
-		char compass_gain;
+		char range_accel;
+		char range_compass;
 		char gps_messages[6];
-		char menu_enabled;
+		char sd_enabled;
+		char output_euler;
+		char output_messages;
+		int cal_ax;
+		int cal_ay;
+		float cal_az;
+		int cal_gx;
+		int cal_gy;
+		int cal_gz;		
 };
 
 extern cConfig configuration;
 
-void configMenu(void);
+void configMenu(cMemory configData);
 void createConfigFile(cMemory configData);
 void readConfigFile(cMemory configData);
 char enablePrompt(void);
