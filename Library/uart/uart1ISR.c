@@ -20,6 +20,7 @@ void ISR_UART1(void)
 	char val = (char)U1RBR;
 	
 	if(val=='\r'){ 	
+		uart1Message[mindex++]='\n';
 		uart1Message[mindex++]='\0';
 		mindex=0;
 		uart1MessageComplete=1;
