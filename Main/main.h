@@ -16,7 +16,6 @@
 
 extern char major_version;
 extern char minor_version;
-extern char log_string[255];
 
 void reset(void);
 

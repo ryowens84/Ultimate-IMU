@@ -11,10 +11,8 @@ ITGPATH = ../Library/itg3200/
 HMCPATH = ../Library/hmc5843/
 EM408PATH = ../Library/em408/
 RTCPATH = ../Library/rtc/
-DELAYPATH = ../Library/delay/
 TIMERPATH = ../Library/timer/
 SENSORPATH = ../Library/sensor/
-PIDPATH = ../Library/pid/
 
 FLASH_TOOL = LPC12
 #FLASH_TOOL = UVISION
@@ -51,14 +49,14 @@ TARGET = main
 SRC = $(SYSTEMPATH)syscalls.c 
 SRC += $(PRINTPATH)rprintf.c 
 SRC += $(UARTPATH)serial.c
-#SRC += $(DELAYPATH)delay.c
 SRC += $(TIMERPATH)timer0.c
 SRC += $(TIMERPATH)timer0ISR.c
 SRC += $(TIMERPATH)timer1.c
 SRC += $(TIMERPATH)timer1ISR.c
 SRC += $(UARTPATH)uart1.c
 SRC += $(UARTPATH)uart1ISR.c
-SRC += $(PIDPATH)pid.c
+SRC += $(UARTPATH)uart0.c
+SRC += $(UARTPATH)uart0ISR.c
 
 #Functions for SD interaction
 SRC += $(SDFATPATH)sd_raw.c 
@@ -96,7 +94,6 @@ CPPSRCARM += $(I2CPATH)I2C.cpp
 CPPSRCARM += $(HMCPATH)HMC5843.cpp
 CPPSRCARM += $(ITGPATH)ITG3200.cpp
 CPPSRCARM += $(EM408PATH)EM408.cpp
-#CPPSRCARM += $(RTCPATH)RTC.cpp
 CPPSRCARM += $(SDFATPATH)memory.cpp
 CPPSRCARM += $(SENSORPATH)sensor.cpp
 
@@ -152,11 +149,8 @@ EXTRAINCDIRS += $(ADXLPATH)
 EXTRAINCDIRS += $(ITGPATH)
 EXTRAINCDIRS += $(HMCPATH)
 EXTRAINCDIRS += $(EM408PATH)
-#EXTRAINCDIRS += $(RTCPATH)
-#EXTRAINCDIRS += $(DELAYPATH)
 EXTRAINCDIRS += $(TIMERPATH)
 EXTRAINCDIRS += $(SENSORPATH)
-EXTRAINCDIRS += $(PIDPATH)
 #EXTRAINCDIRS += ../
 
 
