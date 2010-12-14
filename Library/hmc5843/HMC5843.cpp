@@ -62,7 +62,7 @@ cHMC5843::cHMC5843(int port, char i2c_address)
 	
 }
 
-void cHMC5843::begin(void)
+void cHMC5843::begin(char range)
 {
 	//char values[2];
 	configure();
@@ -72,13 +72,37 @@ void cHMC5843::begin(void)
 	values[1]=CONFIG_REGA_DO2|CONFIG_REGA_DO1;
 	write(values,2);
 	
-	//Compass will use default gain
-	//Don't change CONFIG_REGB
+	//Set the Range for the compass
+	values[0]=CONFIG_REGB;
+	values[1]=(range<<5);
+	write(values, 2);
 	
 	//Configure compass for continuous conversion
 	values[0]=MODE_REG;	
 	values[1]=0x00;		//Set the HMC to continuous conversion mode
 	write(values, 2);	//Write the new data to the HMC register.
+	
+	//Assign the gain based on the range setting
+	switch(range){
+		case 0:	gain=1620;
+			break;
+		case 1:	gain=1300;
+			break;
+		case 2: gain = 970;
+			break;
+		case 3: gain = 780;
+			break;
+		case 4: gain = 530;
+			break;
+		case 5: gain = 460;
+			break;
+		case 6: gain = 390;
+			break;
+		case 7: gain = 280;
+			break;
+		default: gain = 1300;
+			break;
+	}
 }
 
 
@@ -108,19 +132,19 @@ char cHMC5843::update(void)
 
 float cHMC5843::getX(void)
 {
-	xc = xc/1300;
+	xc = xc/gain;
 	return xc;
 }
 
 float cHMC5843::getY(void)
 {
-	yc = yc/1300;
+	yc = yc/gain;
 	return yc;
 }
 
 float cHMC5843::getZ(void)
 {
-	zc = zc/1300;
+	zc = zc/gain;
 	return zc;
 }
 

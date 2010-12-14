@@ -10,7 +10,7 @@ class cHMC5843: public I2C
 		char updated;
 	
 		cHMC5843(int port, char i2c_address);
-		void begin(void);
+		void begin(char range);
 		char read(char * values, char length);
 		char write(char * values, char length);
 		char update(void);
@@ -28,6 +28,7 @@ class cHMC5843: public I2C
 		float yc;
 		float zc;
 		float heading;
+		int gain;
 		
 		char values[6];
 		char _i2c_address;
